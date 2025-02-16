@@ -13,4 +13,4 @@ authRouter.post('/send-reset-otp', sendResetOtp)
 authRouter.post('/verify-reset-otp', verifyResetOtp)
 authRouter.post('/reset-password', resetPassword)
 
-export default authRouter
+export default authRouter 

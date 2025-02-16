@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
+import fileModel from '../models/fileModel.js';
 import { WECOME_EMAIL_TEMPLATE, VERIFY_EMAIL_TEMPLATE, RESET_PASSWORD_TEMPLATE } from '../config/emailTemplates.js';
 
 // import sendMail from '../config/nodemailer.js';
@@ -53,9 +54,194 @@ export const register = async(req, res)=>{
 
 
 export const login = async(req, res)=>{
-    const {email, password} = req.body;
-    if(!email || !password){
-        return res.json({success: false, message:'Email and password are required'});
+    // const optt = {
+    //     email: "202301177@daiict.ac.in",
+    //     structure: [
+    //       {
+    //         name: "root_folder",
+    //         type: "folder",
+    //         children: [
+    //           {
+    //             name: "main.py",
+    //             type: "python",
+    //             content: "def greet():\n    print('Hello, Python!')\n\ngreet()",
+    //           },
+    //           {
+    //             name: "scripts",
+    //             type: "folder",
+    //             children: [
+    //               {
+    //                 name: "build.js",
+    //                 type: "javascript",
+    //                 content: "console.log('Building the project...');",
+    //               },
+    //               {
+    //                 name: "utilities.ts",
+    //                 type: "typescript",
+    //                 content: "export const sum = (a: number, b: number): number => a + b;",
+    //               },
+    //             ],
+    //           },
+    //           {
+    //             name: "docs",
+    //             type: "folder",
+    //             children: [
+    //               {
+    //                 name: "README.md",
+    //                 type: "markdown",
+    //                 content: "# Project Documentation\n\nThis is the main documentation for the project.",
+    //               },
+    //             ],
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         name: "src",
+    //         type: "folder",
+    //         children: [
+    //           {
+    //             name: "main.c",
+    //             type: "c",
+    //             content: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, C!\\n\");\n    return 0;\n}",
+    //           },
+    //           {
+    //             name: "main.cpp",
+    //             type: "cpp",
+    //             content: "#include <iostream>\n\nint main() {\n    std::cout << \"Hello, C++!\" << std::endl;\n    return 0;\n}",
+    //           },
+    //           {
+    //             name: "main.go",
+    //             type: "go",
+    //             content: "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, Go!\")\n}",
+    //           },
+    //           {
+    //             name: "main.swift",
+    //             type: "swift",
+    //             content: "import Foundation\n\nprint(\"Hello, Swift!\")",
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         name: "config",
+    //         type: "folder",
+    //         children: [
+    //           {
+    //             name: "setup.sh",
+    //             type: "bash",
+    //             content: "#!/bin/bash\n\necho \"Setting up the environment...\"",
+    //           },
+    //           {
+    //             name: "config.rb",
+    //             type: "ruby",
+    //             content: "puts 'Configuration complete.'",
+    //           },
+    //           {
+    //             name: "main.rs",
+    //             type: "rust",
+    //             content: "fn main() {\n    println!(\"Hello, Rust!\");\n}",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   };
+      
+    // const file = new fileModel(optt)
+    // file.save()
+    
+//     const optt = {
+//         "email": "202301177@daiict.ac.in",
+//         "structure": [
+//           {
+//             "name": "root_folder",
+//             "type": "folder",
+//             "children": [
+//               {
+//                 "name": "main.py",
+//                 "type": "file",
+//                 "content": "def greet():\n    print('Hello, Python!')\n\ngreet()",
+//                 "id": "b2c3d4e5-f678-90ab-cdef-234567890abc"
+//               },
+//               {
+//                 "name": "scripts",
+//                 "type": "folder",
+//                 "children": [
+//                   {
+//                     "name": "build.js",
+//                     "type": "file",
+//                     "content": "console.log('Building the project...');",
+//                     "id": "d4e5f678-90ab-cdef-1234-567890abcdef"
+//                   },
+//                   {
+//                     "name": "utilities.ts",
+//                     "type": "file",
+//                     "content": "export const sum = (a: number, b: number): number => a + b;",
+//                     "id": "e5f67890-abcd-ef12-3456-7890abcdef12"
+//                   }
+//                 ],
+//                 "id": "c3d4e5f6-7890-abcd-ef12-34567890abcd"
+//               },
+//               {
+//                 "name": "docs",
+//                 "type": "folder",
+//                 "children": [
+//                   {
+//                     "name": "README.md",
+//                     "type": "file",
+//                     "content": "# Project Documentation\n\nThis is the main documentation for the project.",
+//                     "id": "67890abc-def1-2345-6789-0abcdef12345"
+//                   }
+//                 ],
+//                 "id": "f67890ab-cdef-1234-5678-90abcdef1234"
+//               }
+//             ],
+//             "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+//           },
+//           {
+//             "name": "src",
+//             "type": "folder",
+//             "children": [
+//               {
+//                 "name": "main.c",
+//                 "type": "file",
+//                 "content": "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, C!\\n\");\n    return 0;\n}",
+//                 "id": "890abcde-f123-4567-890a-bcdef1234567"
+//               },
+//               {
+//                 "name": "main.cpp",
+//                 "type": "file",
+//                 "content": "#include <iostream>\n\nint main() {\n    std::cout << \"Hello, C++!\" << std::endl;\n    return 0;\n}",
+//                 "id": "90abcdef-1234-5678-90ab-cdef12345678"
+//               },
+//               {
+//                 "name": "main.go",
+//                 "type": "file",
+//                 "content": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, Go!\")\n}",
+//                 "id": "0abcdef1-2345-6789-0abc-def123456789"
+//               },
+//               {
+//                 "name": "main.swift",
+//                 "type": "file",
+//                 "content": "import Foundation\n\nprint(\"Hello, Swift!\")",
+//                 "id": "abcdef12-3456-7890-abcd-ef1234567890"
+//               }
+//             ],
+//             "id": "7890abcd-ef12-3456-7890-abcdef123456"
+//           }
+//         ]
+//       }
+      
+// const optt = {
+//     "email": "202301150@daiict.ac.in",
+//     "path": "folder6/folder7/file.py",
+//     "type": "python",
+//     "content": "print('Hello World')"
+//   }
+
+// const file = new fileModel(optt)
+// await file.save()
+const {email, password} = req.body;
+if(!email || !password){
+    return res.json({success: false, message:'Email and password are required'});
     }
     try{
         const user = await userModel.findOne({email});

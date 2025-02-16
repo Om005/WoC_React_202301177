@@ -11,6 +11,7 @@ export const getUserData = async(req, res)=>{
         res.json({
             success: true,
             userData: {
+                email: user.email,
                 name: user.name,
                 isAccountVerified: user.isAccountVerified, 
             }
