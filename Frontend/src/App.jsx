@@ -13,6 +13,7 @@ import Ide from './components/IDE'
 const App = () => {
   return (
     <div>
+
               <Toaster/>
       <Router>
         <Routes>

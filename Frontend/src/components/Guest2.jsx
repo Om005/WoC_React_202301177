@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { cn } from "../lib/utils";
 import { Editor } from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -9,7 +9,8 @@ import themes from "../constants/Themes";
 import languages from "../constants/info";
 
 import { useMonaco } from "@monaco-editor/react";
-export default function Guest2({signup}) {
+import { AppContent } from "../context/Appcontex";
+export default function Guest2(item) {
   return (
     <div
       className={cn(
@@ -17,35 +18,100 @@ export default function Guest2({signup}) {
         "h-[100vh]"
       )}
     >
-      <Dashboard signup={signup}/>
+      <Dashboard item={item}/>
     </div>
   );
 }
-const Dashboard = ({signup}) => {
-  const monaco = useMonaco();
+const Dashboard = (item) => {
+    const { backendurl } = useContext(AppContent)
+  // const monaco = useMonaco();
+  // // const curritem = localStorage.getItem('item')
+  // const localitem = JSON.parse(localStorage.getItem('item'));
+  // const curritem = item.item?item.item:localitem
+  // const [tempp, settempp] = useState(null)
+  // // console.log(curritem.item.type)
+  // const [selectedLanguage, setSelectedLanguage] = useState(curritem?.type||"")
+  // const [filename, setfilename] = useState(curritem?.name||localitem.item.name)
+  // const [code, setcode] = useState(curritem?.content||localitem.item.content)
+  // const [type, settype] = useState(languages[curritem.type]||languages[localitem.item.type].type)
+  // const [extension, setextension] = useState(languages[curritem.type]||languages[localitem.item.type].extension)
 
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    localStorage.getItem("ip") === null
-      ? "javascript"
-      : localStorage.getItem("lang")
-  );
+  // useEffect(() => {
+  //   if(curritem.item){
+
+  //     localStorage.setItem('item', JSON.stringify(curritem));
+  //     settempp(curritem)
+  //   }
+
+    
+  //   setcode(localitem.item.content);
+  //   setSelectedLanguage(localitem.item.type);
+  //   settype(languages[localitem.item.type].type);
+  //   setextension(languages[localitem.item.type].extension);
+  //   setfilename(localitem.item.name)
+
+  // }, [item, localitem]);
+  const monaco = useMonaco();
+  // const curritem = localStorage.getItem('item')
+  const localitem = JSON.parse(localStorage.getItem('item'));
+  const [tempp, settempp] = useState(null)
+  // console.log(curritem.item.type)
+  const [selectedLanguage, setSelectedLanguage] = useState(localitem?.item?.type||"")
+  const [filename, setfilename] = useState(localitem?.item?.name||"")
+  const [code, setcode] = useState(localitem?.item?.content||"")
+  const [type, settype] = useState(languages[localitem?.item?.type||""]?.type||"")
+  const [extension, setextension] = useState(languages[localitem?.item?.type||""]?.extension||"")
+  // console.log("nownow", item?.item.item._id||"")
+  useEffect(() => {
+    async function okk() {
+      if(item.item.item){
+        console.log(item.item)
+        const id = item.item.item._id;
+        const okk = await axios.post(backendurl+'/api/file/read' , {_id: id});
+        console.log("yeyyy", okk);
+        // localStorage.setItem('item', JSON.stringify(item.item));
+        settempp(item.item)
+      }
+  
+      setcode(localitem?.item?.content||"");
+      console.log("okokok", localitem?.item?.content)
+      setSelectedLanguage(localitem?.item?.type||"");
+      settype(languages[localitem?.item?.type||""]?.type||"");
+      setextension(languages[localitem?.item?.type||""]?.extension||"");
+      setfilename(localitem?.item?.name||"")
+    }
+    okk();
+  }, [item]);
+
+  // useEffect(() => {
+  //   if (localitem) {
+  //     setcode(localitem.content || "");
+  //     setSelectedLanguage(localitem.type || "");
+  //     settype(languages[localitem.type]?.type || "");
+  //     setextension(languages[localitem.type]?.extension || "");
+  //     setfilename(localitem.name || "");
+  //   }
+  // }, []);
+  useEffect(() => {
+    if (!localStorage.getItem('item')) {
+      localStorage.setItem(
+        'item',
+        JSON.stringify({
+          name: 'default.txt',
+          type: 'txt',
+          content: '',
+        })
+      );
+    }
+  }, []);
+  
+  
   const [ip, setip] = useState(
-    localStorage.getItem("ip") ? "" : localStorage.getItem("ip")
+    localStorage.getItem("ips") ? "" : localStorage.getItem("ips")
   );
   const [output, setoutput] = useState("");
-  const [code, setcode] = useState(
-    localStorage.getItem("code") === null
-      ? languages["javascript"].boilerplate
-      : localStorage.getItem("code")
-  );
-  const [type, settype] = useState(
-    localStorage.getItem("code") == null
-      ? "text/javascript"
-      : localStorage.getItem("ex")
-  );
-  const [extension, setextension] = useState(
-    localStorage.getItem("ex") === null ? ".js" : localStorage.getItem("ex")
-  );
+
+
 
   const [hovered, setHovered] = useState(false);
   const [hoveredi, setHoveredi] = useState(false);
@@ -72,28 +138,7 @@ const Dashboard = ({signup}) => {
     setHoveredi(false);
   };
 
-  const handleChange = (e) => {
-    setSelectedLanguage(e.target.value);
-    localStorage.setItem("lang", e.target.value);
-    console.log(e.target.value);
-    setcode(languages[e.target.value].boilerplate);
-    localStorage.setItem("code", languages[e.target.value].boilerplate);
-    settype(languages[e.target.value].type);
-    setextension(languages[e.target.value].extension);
-    localStorage.setItem("ex", languages[e.target.value].extension);
-  };
 
-  const handlefile = (e) => {
-    const f = e.target.files[0];
-    if (f) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setip(e.target.result);
-        localStorage.setItem("ip", e.target.value);
-      };
-      reader.readAsText(f);
-    }
-  };
 
   const handledownload = () => {
     const blob = new Blob([code], { type: type });
@@ -104,6 +149,7 @@ const Dashboard = ({signup}) => {
   };
 
   const handlerun = async () => {
+    console.log(type)
     setsee(true);
     document.querySelector(".run").style.backgroundColor = "#4461BD";
     document.querySelector(".run").children[1].innerHTML = "Running...";
@@ -200,15 +246,7 @@ const Dashboard = ({signup}) => {
     }
   };
 
-  // const handleFormat = () => {
-  //   const editor = monaco.editor.getModels()[0]; // Get the first model (or a specific model if needed)
-  //   if (editor) {
-  //     const formatAction = monaco.getAction("editor.action.formatDocument");
-  //     if (formatAction) {
-  //       formatAction.run(); // Run the format action
-  //     }
-  //   }
-  // };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "z" && e.altKey) {
@@ -309,16 +347,16 @@ const Dashboard = ({signup}) => {
       <div className="p-2 md:p-3 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
         <div className="flex gap-2 nunito">
           <div className="h-12 w-full rounded-lg  bg-gray100 dar:bg-neutral-800 flex justify-start items-center">
-            {!signup && <Link
+            {/* {!signup && <Link
               to={"/"}
                 className="text-blue-400 roboto p-2 saira-condensed-semibold text-xl bg-[#1E1E1E] shadow shadow-white rounded-lg m-1"
             >
               <img src="./imgs/logo2.png" className="invert w-36 mr-2" alt="" />
-            </Link>}
+            </Link>} */}
 
             <select
               value={selectedLanguage}
-              onChange={handleChange}
+              // onChange={handleChange}
               className="w-[50%] px-3 py-2 bg-[#171717] text-white border rounded-lg focus:outline-none focus:border-blue-500"
             >
               {Object.values(languages).map((lang) => (
@@ -361,13 +399,13 @@ const Dashboard = ({signup}) => {
                 </option>
               ))}
             </select>
-            {!signup && <Link
+            {/* {!signup && <Link
               to={"/signin"}
               className="px-4 m hover:translate-x-1 duration-200 py-2 text-lg bg-[#0BA6ECCC] text-white flex gap-2 items-center rounded-lg hover:bg-sky-600 focus:outline-none w-full md:w-auto"
             >
               <img src="./imgs/login.png" className="w-5 invert" alt="" /> Sign
               in
-            </Link>}
+            </Link>} */}
           </div>
         </div>
 
@@ -378,7 +416,7 @@ const Dashboard = ({signup}) => {
                 <div className="flex items-center justify-between">
                   <p className="flex text-white nunito gap-2 justify-start items-center text-lg p-1 px-3">
                     <img src="./svgs/code.svg" className="w-5" alt="" />
-                    Code
+                    {filename}
                   </p>
                   {/* <div className="dl">
 
@@ -580,11 +618,14 @@ const Dashboard = ({signup}) => {
       )}
       <Editor
         value={code}
-        onChange={(e) => {
-          setcode(e);
-          localStorage.setItem("code", e);
-          console.log(e);
+        onChange={async(e) => {
+          const item = JSON.parse(localStorage.getItem("item")) || {}; // Get the existing item or an empty object
+          item.item.content = e; // Update content
+          localStorage.setItem("item", JSON.stringify(item)); // Store back in localStorage
+          console.log(item);
+          axios.post(backendurl+'/api/file/write' , item);
         }}
+        
         className="z-10"
         height="100%"
         language={selectedLanguage}

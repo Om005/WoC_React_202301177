@@ -9,6 +9,7 @@ export const AppContextProvider = (props)=>{
     const backendurl = import.meta.env.VITE_BACKEND_URL
     const [isLoggedin, setisLoggedin] = useState(false)
     const [userData, setuserData] = useState(false)
+    const [files, setfiles] = useState("")
 
     const getAuthState = async()=>{
         try{
@@ -29,6 +30,20 @@ export const AppContextProvider = (props)=>{
         try{
             const {data} = await axios.get(backendurl+'/api/user/data')
             data.success?setuserData(data.userData):toast.error(data.message)
+            let emaill = data.userData.email
+            {
+                const {data} = await axios.post(backendurl+'/api/file/get-files', {email: emaill})
+                console.log(data)
+                setfiles(data.structure)
+            }
+        }catch(error){
+            toast.error(error.message)
+        }
+    }
+    const fileData = async()=>{
+        try{
+            const {data} = await axios.get(backendurl+'/api/file/get-files')
+            data.success?setfiles(data.structure):toast.error(data.message)
         }catch(error){
             toast.error(error.message)
         }
@@ -36,13 +51,16 @@ export const AppContextProvider = (props)=>{
     
     useEffect(()=>{
         getAuthState()
+        getUserData();
     }, [])
 
     const value = {
         backendurl,
         isLoggedin, setisLoggedin ,
         userData, setuserData,
-        getUserData
+        getUserData,
+        files, setfiles,
+        fileData
     }
     
     return (

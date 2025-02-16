@@ -23,7 +23,16 @@ export default function Signin() {
       e.preventDefault();
 
       axios.defaults.withCredentials = true;
-        const {data} = await axios.post(backendurl+'/api/auth/login', {email, password})
+      {
+
+        const {data} = await axios.post(backendurl+'/api/file/get-files', {email});
+        console.log(data)
+        setfiles(data.structure)
+        console.log(data.structure)
+      }
+      const {data} = await axios.post(backendurl+'/api/auth/login', {email, password})
+      // console.log(file)
+      console.log(data)
 
         if(data.success){
           setisLoggedin(true);
@@ -49,7 +58,7 @@ setTimeout(() => {
   const [email, setemail] = useState('')
   const [password, setpassword] = useState('')
 
-  const {backendurl, setisLoggedin, getUserData} = useContext(AppContent)
+  const {backendurl, setisLoggedin, getUserData, files, setfiles, fileData} = useContext(AppContent)
   return (
     (
       <div className="flex flex-col items-center justify-center h-screen">
